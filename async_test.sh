@@ -26,5 +26,7 @@ pushd $ASYNC_TEST_DIR
 
 python3 async_test.py --bmodel ./models/resnet/resnet50_int8_1b.bmodel
 
+python3 async_test.py --bmodel ./models/resnet/resnet50_int8_8b.bmodel
+
 conda deactivate
 popd
