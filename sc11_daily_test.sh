@@ -16,11 +16,11 @@ DAILY_TEST_DIR=$(dirname $(readlink -f "$0"))
 pushd $DAILY_TEST_DIR
 
 # ./update_env.sh 2>&1 | tee update_env.log
-./update_env.sh
+timeout 5m ./update_env.sh
 judge_ret $? "update_env.sh"
 
 # run your test scripts here
-./async_test.sh
+timeout 5m ./async_test.sh
 judge_ret $? "async_test.sh"
 
 popd
