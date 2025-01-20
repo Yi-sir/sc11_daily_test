@@ -151,11 +151,11 @@ function check_driver_status() {
 }
 
 function check_dmesg_fail() {
-    if dmesg -T | tail -n 100 | grep -q "fail"; then
-        echo "found 'fail' in dmesg logs."
+    if dmesg -T | tail -n 100 | grep -Eiq "fail|error"; then
+        echo "found 'fail' or 'error' in dmesg logs."
         return 1
     else
-        echo "No 'fail' found in dmesg logs."
+        echo "No 'fail' or 'error' found in dmesg logs."
         return 0
     fi
 }
