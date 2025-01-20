@@ -150,6 +150,16 @@ function check_driver_status() {
     echo "sgcard module is not in use. Proceeding..."
 }
 
+function check_dmesg_fail() {
+    if dmesg -T | tail -n 100 | grep -q "fail"; then
+        echo "found 'fail' in dmesg logs."
+        return 1
+    else
+        echo "No 'fail' found in dmesg logs."
+        return 0
+    fi
+}
+
 function install_driver() {
     pushd $DAILY_DEBS_DIR
 
@@ -157,6 +167,9 @@ function install_driver() {
 
     sudo dpkg -i tpuv7-driver*.deb
     judge_ret $? "Installed tpuv7-driver"
+
+    check_dmesg_fail
+    judge_ret $? "Checked dmesg logs"
 
     popd
 }
@@ -214,8 +227,8 @@ function install_sail() {
         exit 1
     fi
     pip3 install ${sail_wheel_filename} --force-reinstall --no-deps
-    rm -rf ./sophon-sail*
     judge_ret $? "Installed sohpon-sail"
+    rm -rf ./sophon-sail*
     popd
     conda deactivate
 }
