@@ -20,7 +20,9 @@ timeout 5m ./update_env.sh
 judge_ret $? "update_env.sh"
 
 # run your test scripts here
-timeout 5m ./async_test.sh
+
+# 15min to prevent too long download time
+timeout 15m ./async_test.sh
 judge_ret $? "async_test.sh"
 
 popd
