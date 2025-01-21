@@ -151,7 +151,7 @@ function check_driver_status() {
 }
 
 function check_dmesg_fail() {
-    if dmesg -T | tail -n 100 | grep -Eiq "fail|error"; then
+    if dmesg -T | tail -n 50 | grep -Eiq "fail|error at"; then
         echo "found 'fail' or 'error' in dmesg logs."
         return 1
     else
@@ -165,7 +165,7 @@ function install_driver() {
 
     check_driver_status
 
-    sudo dpkg -i tpuv7-driver*.deb
+    echo $HOST_PASSWD | sudo -S dpkg -i tpuv7-driver*.deb
     judge_ret $? "Installed tpuv7-driver"
 
     check_dmesg_fail
