@@ -3,7 +3,7 @@
 DAILY_TEST_DIR=$(dirname $(readlink -f "$0"))
 DAILY_DEBS_DIR=$DAILY_TEST_DIR/ftp-$(date +'%Y-%m-%d')
 
-HOST_PASSWD='sn123456'
+HOST_PASSWD='xuyizhou'
 
 FTP_USER='AI'
 FTP_PASSWD='SophgoRelease2022'
@@ -12,6 +12,8 @@ FTP_HOST='172.28.141.89'
 tpuv7rt_version="*"
 sophon_media_version="*"
 sophon_sail_version="*"
+tpuv7rt_version_from_sail="*"
+sophon_media_version_from_sail="*"
 
 function judge_ret() {
   if [[ $1 == 0 ]]; then
@@ -216,20 +218,31 @@ function get_latest_sail() {
 }
 
 function install_sail() {
-    source /home/sn/miniconda3/etc/profile.d/conda.sh
+    conda_path=/home/xyz/miniconda3/etc/profile.d/conda.sh
+    forge_path=/home/xyz/miniforge3/etc/profile.d/conda.sh
+
+    if [[ -e $conda_path ]]; then
+        source $conda_path
+    else
+        source $forge_path
+    fi
     conda activate sail3.10
     pushd $DAILY_DEBS_DIR
     tar -zxvf sophon-sail*.tar.gz
-    echo "current tpuv7rt version: $tpuv7rt_version"
-    echo "current sophon_media version: $sophon_media_version"
-    local sail_wheel_filename=sophon-sail/python_wheels/x86_64_pcie/tpuv7rt-${tpuv7rt_version}_sophon_media-${sophon_media_version}/py310/sophon-${sophon_sail_version}-py3-none-any.whl
+    echo "current tpuv7rt version from deb: $tpuv7rt_version"
+    echo "current sophon_media version from deb: $sophon_media_version"
+    local sail_wheel_filename=sophon-sail/python_wheels/x86_64_pcie/tpuv7rt-${tpuv7rt_version_from_sail}_sophon_media-${sophon_media_version_from_sail}/py310/sophon-${sophon_sail_version}-py3-none-any.whl
 
     for file in $sail_wheel_filename; do
         if [[ -f $file ]]; then
             # 提取版本号
-            if [[ $file =~ sophon-sail/python_wheels/x86_64_pcie/tpuv7rt-${tpuv7rt_version}_sophon_media-${sophon_media_version}/py310/sophon-([0-9]+\.[0-9]+\.[0-9]+)-py3-none-any.whl ]]; then
-                sophon_sail_version=${BASH_REMATCH[1]}
+            if [[ $file =~ sophon-sail/python_wheels/x86_64_pcie/tpuv7rt-([0-9]+\.[0-9]+\.[0-9]+)_sophon_media-([0-9]+\.[0-9]+\.[0-9]+)/py310/sophon-([0-9]+\.[0-9]+\.[0-9]+)-py3-none-any.whl ]]; then
+                tpuv7rt_version_from_sail=${BASH_REMATCH[1]}
+                sophon_media_version_from_sail=${BASH_REMATCH[2]}
+                sophon_sail_version=${BASH_REMATCH[3]}
                 echo "File: $file"
+                echo "tpuv7rt version from sail: $tpuv7rt_version_from_sail"
+                echo "sophon_media version from sail: $sophon_media_version_from_sail"
                 echo "Sail Version: $sophon_sail_version"
             else
                 echo "Version not found in file name: $file"
