@@ -11,6 +11,7 @@ FTP_HOST='172.28.141.89'
 
 tpuv7rt_version="*"
 sophon_media_version="*"
+sophon_sail_version="*"
 
 function judge_ret() {
   if [[ $1 == 0 ]]; then
@@ -221,11 +222,23 @@ function install_sail() {
     tar -zxvf sophon-sail*.tar.gz
     echo "current tpuv7rt version: $tpuv7rt_version"
     echo "current sophon_media version: $sophon_media_version"
-    local sail_wheel_filename=sophon-sail/python_wheels/x86_64_pcie/tpuv7rt-${tpuv7rt_version}_sophon_media-${sophon_media_version}/py310/sophon-0.3.0-py3-none-any.whl
-    if [ ! -e "$sail_wheel_filename" ]; then
-        echo -e "\033[31m file $sail_wheel_filename does not exist. \033[0m"
-        exit 1
-    fi
+    local sail_wheel_filename=sophon-sail/python_wheels/x86_64_pcie/tpuv7rt-${tpuv7rt_version}_sophon_media-${sophon_media_version}/py310/sophon-${sophon_sail_version}-py3-none-any.whl
+
+    for file in $sail_wheel_filename; do
+        if [[ -f $file ]]; then
+            # 提取版本号
+            if [[ $file =~ sophon-sail/python_wheels/x86_64_pcie/tpuv7rt-${tpuv7rt_version}_sophon_media-${sophon_media_version}/py310/sophon-([0-9]+\.[0-9]+\.[0-9]+)-py3-none-any.whl ]]; then
+                sophon_sail_version=${BASH_REMATCH[1]}
+                echo "File: $file"
+                echo "Sail Version: $sophon_sail_version"
+            else
+                echo "Version not found in file name: $file"
+            fi
+        else
+            echo "No file found matching the pattern: $sail_wheel_filename"
+        fi
+    done
+
     pip3 install ${sail_wheel_filename} --force-reinstall --no-deps
     judge_ret $? "Installed sohpon-sail"
     rm -rf ./sophon-sail*
