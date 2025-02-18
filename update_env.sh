@@ -254,7 +254,6 @@ function install_sail() {
 
     pip3 install ${sail_wheel_filename} --force-reinstall --no-deps
     judge_ret $? "Installed sohpon-sail"
-    rm -rf ./sophon-sail*
     popd
     conda deactivate
 }
