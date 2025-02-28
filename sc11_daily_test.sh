@@ -20,6 +20,8 @@ timeout 5m ./update_env.sh
 judge_ret $? "update_env.sh"
 
 # run your test scripts here
+timeout 15m ./sail_test.sh
+judge_ret $? "sail_test.sh"
 
 # 15min to prevent too long download time
 timeout 15m ./async_test.sh
