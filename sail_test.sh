@@ -1,3 +1,6 @@
+#!/bin/bash
+
+
 function judge_ret() {
   if [[ $1 == 0 ]]; then
     echo -e "\033[32m Passed: $2 \033[0m"
