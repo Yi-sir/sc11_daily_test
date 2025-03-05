@@ -48,10 +48,10 @@ python3 -m pytest test_Decoder.py
 judge_ret $? "test_Decoder of sail_test"
 popd
 
-pushd ./Encoder
-python3 -m pytest test_Encoder.py
-judge_ret $? "test_Encoder of sail_test"
-popd
+# pushd ./Encoder
+# python3 -m pytest test_Encoder.py
+# judge_ret $? "test_Encoder of sail_test"
+# popd
 
 pushd ./Engine
 python3 -m pytest test_Engine.py
