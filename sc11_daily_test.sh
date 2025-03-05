@@ -12,10 +12,10 @@ function judge_ret() {
 }
 
 DAILY_TEST_DIR=$(dirname $(readlink -f "$0"))
+DAILY_DEBS_DIR=$DAILY_TEST_DIR/ftp-$(date +'%Y-%m-%d')
 
 pushd $DAILY_TEST_DIR
 
-# ./update_env.sh 2>&1 | tee update_env.log
 timeout 5m ./update_env.sh
 judge_ret $? "update_env.sh"
 
@@ -28,3 +28,5 @@ timeout 15m ./async_test.sh
 judge_ret $? "async_test.sh"
 
 popd
+
+rm -rf $DAILY_DEBS_DIR

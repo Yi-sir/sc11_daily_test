@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 function judge_ret() {
   if [[ $1 == 0 ]]; then
     echo -e "\033[32m Passed: $2 \033[0m"
@@ -12,25 +11,35 @@ function judge_ret() {
   sleep 2
 }
 
-pushd sophon-sail2/tests
+DAILY_TEST_DIR=$(dirname $(readlink -f "$0"))
+DAILY_DEBS_DIR=$DAILY_TEST_DIR/ftp-$(date +'%Y-%m-%d')
+sail_dir=$DAILY_DEBS_DIR/sophon-sail/tests
 
-if [! -d "./data"];
+echo "sail dir is $sail_dir"
+
+pushd $sail_dir
+
+conda_path=/home/xyz/miniconda3/etc/profile.d/conda.sh
+forge_path=/home/xyz/miniforge3/etc/profile.d/conda.sh
+
+if [[ -e $conda_path ]]; then
+    source $conda_path
+else
+    source $forge_path
+fi
+conda activate sail3.10
+
+if [ ! -d "./data" ];
 then
-    mkdir ./data
-    pushd data
     python3 -m dfss --url=open@sophgo.com:sophon-sail/SC11/tests/data.tar.gz
     tar xvf data.tar.gz && rm data.tar.gz
-    popd
     echo "data downloaded!"
 fi
 
-if [! -d "./models"];
+if [ ! -d "./models" ];
 then
-    mkdir ./models
-    pushd models
     python3 -m dfss --url=open@sophgo.com:sophon-sail/SC11/tests/models.tar.gz
     tar xvf models.tar.gz && rm models.tar.gz
-    popd
     echo "models downloaded!"
 fi
 
@@ -68,6 +77,8 @@ pushd ./Tensor
 pythone -m pytest test_Tensor.py
 judge_ret $? "test_Tensor of sail_test"
 popd
+
+conda deactivate
 
 popd
 

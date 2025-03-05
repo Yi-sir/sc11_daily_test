@@ -263,4 +263,4 @@ install_debs
 get_latest_sail
 install_sail
 
-rm -rf $DAILY_DEBS_DIR
+# rm -rf $DAILY_DEBS_DIR
