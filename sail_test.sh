@@ -74,7 +74,7 @@ judge_ret $? "test_Stream of sail_test"
 popd
 
 pushd ./Tensor
-pythone -m pytest test_Tensor.py
+python -m pytest test_Tensor.py
 judge_ret $? "test_Tensor of sail_test"
 popd
 
