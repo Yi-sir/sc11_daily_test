@@ -46,7 +46,27 @@ def para_prase():
 
     args = parser.parse_args()
 
+    if not os.path.exists(args.data):
+        print(f"Data path does not exist: {args.data}")
+        exit()
+    else:
+        print(f"Data path exist: {args.data}")
+
     return args
+
+def is_port_in_use(port):
+    """Check whether the specified port is occupied"""
+    try:
+        # Use the 'Ss' command to check the port
+        result = subprocess.run(['ss', '-tuln'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        # Traverse each line of the output and check the port
+        for line in result.stdout.splitlines():
+            if f':{port}' in line:
+                return False
+    except Exception as e:
+        print(f"Error detecting port: {e}")
+    return True
+
 
 def get_daily_build():
     username = "AI"
@@ -101,38 +121,34 @@ def build_test_container(idx,args):
         print("Container tgi already exists. Remove and rebuild it...")
         container.stop()
         container.remove()
-        container = client.containers.run(
-            image="soph_tgi:0.2-slim",
-            name="tgi_daily_test_"+str(idx),
-            detach=True,
-            tty=True,
-            privileged=True,
-            ports={"80": "801"+str(idx)},
-            volumes={
-                "/opt": {"bind": "/opt", "mode": "rw"},
-                "/dev": {"bind": "/dev", "mode": "rw"},
-                args.data: {"bind": "/data", "mode": "rw"},
-                home_dir: {"bind": "/workspace", "mode": "rw"}
-            },
-            restart_policy={"Name": "always"},
-            entrypoint="bash"
-        )
+
     except docker.errors.NotFound:
         print("Container tgi does not exist. Creating a new one...")
+
+    finally:
+        port = int("1808"+str(idx))
+        for i in range(10000):
+            if is_port_in_use(port):
+                print(f"Port {port} available!")
+                break
+            elif i != 9999:
+                print(port," is used ")
+                port+=1
+            else:
+                print("No ports available!")
+                exit()
         container = client.containers.run(
             image="soph_tgi:0.2-slim",
             name="tgi_daily_test_"+str(idx),
             detach=True,
             tty=True,
             privileged=True,
-            ports={"80": "801"+str(idx)},
+            ports={"80": str(port)},
             volumes={
                 "/opt": {"bind": "/opt", "mode": "rw"},
                 "/dev": {"bind": "/dev", "mode": "rw"},
                 args.data: {"bind": "/data", "mode": "rw"},
-                home_dir: {"bind": "/workspace", "mode": "rw"}
             },
-            restart_policy={"Name": "always"},
             entrypoint="bash"
         )
 
@@ -145,7 +161,6 @@ def build_test_env(args):
     for i in range(1):
         build_test_container(i,args)
         container_names.append("tgi_daily_test_"+str(i))
-
     return docker_file, container_names
 
 def test_run(input_len, output_len, tp, model, batch, model_path, is_multi_chip, dev):

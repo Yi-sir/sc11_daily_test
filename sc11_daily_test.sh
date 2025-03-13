@@ -27,7 +27,7 @@ judge_ret $? "sail_test.sh"
 timeout 15m ./async_test.sh
 judge_ret $? "async_test.sh"
 
-# 15min to prevent too long download time
+# 10min to prevent too long download time
 timeout 10m ./tgi_test.sh
 judge_ret $? "tgi_test.sh"
 
