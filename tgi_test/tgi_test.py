@@ -161,7 +161,6 @@ def test_run(input_len, output_len, tp, model, batch, model_path, is_multi_chip,
         cmd = "CONTEXT_LEN=" + str(input_len) + " DECODE_TOKEN_LEN=" + str(output_len) + " torchrun --nproc_per_node " + str(tp) + " --nnodes 1 \
     /usr/src/server/tests/soph_test/test_whole_parallel.py --model " + model +" --quantize gptq"+ " --batch " + str(batch) + " --path " + model_path
         cmd = env_vars + " && " + cmd
-
     
     print(cmd)
     client = docker.from_env()
@@ -280,8 +279,23 @@ def docker_clean(docker_file,container_names):
     except subprocess.CalledProcessError as e:
         print(f"container clean error: {e}")
 
+    # Create a Docker client
+    client = docker.from_env()
+    # Get all images
+    images = client.images.list()
+    # Iterate through images and remove dangling images
+    for image in images:
+        if image.tags == []:  # Check if the image has no tags
+            try:
+                print(f"Removing image {image.id}...")
+                client.images.remove(image.id, force=True)
+                print(f"Removed image {image.id}")
+            except Exception as e:
+                print(f"Error removing image {image.id}")
+
 
 if __name__=="__main__":
+    
     start_time = time.time()
     args = para_prase()
     docker_file, container_names = build_test_env(args)
