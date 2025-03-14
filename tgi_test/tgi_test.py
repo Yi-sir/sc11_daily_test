@@ -23,21 +23,6 @@ chip_table = {"0": "0,1",
               "7": "14,15",}
 
 def para_prase():
-    # parser = argparse.ArgumentParser(description="TGI test parameters")
-
-    # parser.add_argument("--tps", type=int, default=8, help="The number of TP")
-    # parser.add_argument("--model", type=str, default="llama3.1", help="The model will be tested")
-    # parser.add_argument("--container", type=str, default="tgi_daily_test", help="The container used")
-
-    # args = parser.parse_args()
-
-    # if (args.tps not in [1, 2, 4, 8]):
-    #     print("TP only supports 1, 2, 4, and 8")
-    #     exit()
-        
-    # if (args.model.lower() not in model_support_list):
-    #     print("Current TGI not support {0}".format(args.model))
-    #     exit()
     parser = argparse.ArgumentParser(description='device used')
     parser.add_argument('--dev', type=int, default=0, help='type int')
     parser.add_argument('--models', type=str, nargs='+', default=["llama", "qwen"], help="The models will be tested")
@@ -214,6 +199,10 @@ def data_clean(data):
         batch_match = re.search(res_pattern, line)
         if batch_match:
             res_content = batch_match.group(1)
+            
+    print(">>>>>>> test completed >>>>>>>")
+    print(f"FTL: {ftl}, TPS: {tps}, ANS: {res_content}")
+    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
 
     return ftl, tps, res_content
 
