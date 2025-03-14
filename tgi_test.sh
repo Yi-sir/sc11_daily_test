@@ -25,7 +25,7 @@ fi
 conda activate sail3.10
 
 python3 tgi_test.py --models 'llama' --mode 1 --data '/home/xyz/LLM' >> "$log_file" 2>&1
-#python3 tgi_test.py --models 'llama' 'qwen' --mode 1 0 --data '/home/xyz/LLM' >> "$log_file" 2>&1
+# python3 tgi_test.py --models 'llama' 'qwen' --mode 1 0 --data '/home/xyz/LLM' >> "$log_file" 2>&1
 
 conda deactivate
 
