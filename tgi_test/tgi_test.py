@@ -8,6 +8,7 @@ import os
 import re
 import pandas as pd
 from datetime import datetime
+import sys
 
 model_support_list = ["llama2", "qwen", "llama3.1", "llava"]
 
@@ -152,7 +153,7 @@ def test_run(input_len, output_len, tp, model, batch, model_path, is_multi_chip,
     if (is_multi_chip):
         # env_vars = {"TPU_CACHE_HOST_BATCH": "5"}
         # env_vars = "export CHIP_MAP=" +  "0,1,5,3,7,6,2,4 "  + " && export TPU_CACHE_HOST_BATCH=5"
-        env_vars = "export TPU_CACHE_HOST_BATCH=5 && export DEVID=" +  str(dev) + " && export DISABLE_CACHE=ON "
+        env_vars = "export CHIP_MAP=" +  chip_table[str(dev)]  + " && export TPU_CACHE_HOST_BATCH=5 && export DEVID=" +  str(dev)
         cmd = "CONTEXT_LEN=" + str(input_len) + " DECODE_TOKEN_LEN=" + str(output_len) + " python3 " + "/usr/src/server/tests/soph_test/test_whole_model.py --model \
 " + model + " --batch " + str(batch) + " --path " + model_path
         cmd = env_vars + " && " + cmd
@@ -173,6 +174,14 @@ def test_run(input_len, output_len, tp, model, batch, model_path, is_multi_chip,
     exit_code, output = container.exec_run(f"/bin/bash -c '{cmd}'", tty=True)
 
     output = output.decode("utf-8")
+
+    # exit_code = 1
+    # Check the exit code
+    if exit_code != 0:
+        print(f"Command execution failed, exit code: {exit_code}")
+        print(f"Error output:\n{output}")
+        sys.exit(exit_code)  # Pass the Docker exit code
+
 
     ansi_escape = re.compile(r'\x1b\[.*?m')
     clean_output = ansi_escape.sub('', output)
@@ -229,8 +238,8 @@ def data_save(ftl, tps, res, model, date, input_len, output_len, batch, dev):
 
 def daily_test(args):
 
-    input_len = [128]
-    output_len = [128]
+    input_len = [32]
+    output_len = [32]
     tp = 2
     model = args.models
     mode = args.mode
