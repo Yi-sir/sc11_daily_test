@@ -13,6 +13,9 @@ log_file="./test_result/test_result_$current_date.log"
 mkdir -p ./test_result
 # run tgi_test.py 
 # mode 1 表示单芯
+# mode 0 表示双芯
+# test_whole_parallel.py --model:(choose from 'llama2-70b', 'llama2-7b', 'llama3-70b', 'llama3.1-8b', 'qwen2-72b', 'qwen2.5-32b', 'qwen2.5-14b', 'qwen2-7b', 'qwen2-57b-a14b')
+# test_whole_model.py --model:(choose from 'llama2-7b', 'llama3.1-8b', 'qwen2.5-32b', 'qwen2.5-14b', 'qwen2-7b', 'qwen2-57b-a14b')
 
 conda_path=/home/xyz/miniconda3/etc/profile.d/conda.sh
 forge_path=/home/xyz/miniforge3/etc/profile.d/conda.sh
@@ -24,11 +27,12 @@ else
 fi
 conda activate sail3.10
 
-python3 tgi_test.py --models 'llama' --mode 1 --data '/home/xyz/LLM' >> "$log_file" 2>&1 || {
+python3 tgi_test.py --models 'llama2-7b' --mode 1 --data '/workspace/models/' >> "$log_file" 2>&1 || {
     echo "Tgi_test script execution failed, exit!"
     exit 1
 }
-# python3 tgi_test.py --models 'llama' 'qwen' --mode 1 0 --data '/home/xyz/LLM' >> "$log_file" 2>&1
+# python3 tgi_test.py --models 'llama2-7b' 'llama3.1-8b' --mode 1 1 --data '/workspace/models/' >> "$log_file" 2>&1
+
 
 conda deactivate
 
