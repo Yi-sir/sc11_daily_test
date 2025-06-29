@@ -38,9 +38,12 @@ fi
 
 if [ ! -d "./models" ];
 then
+    mkdir models
+    pushd models
     python3 -m dfss --url=open@sophgo.com:sophon-sail/SC11/tests/models.tar.gz
     tar xvf models.tar.gz && rm models.tar.gz
     echo "models downloaded!"
+    popd
 fi
 
 pushd ./Decoder
